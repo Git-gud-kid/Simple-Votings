@@ -1,0 +1,58 @@
+<nav class="navbar navbar-expand-lg" style="background-color: #e6e6e6;">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'index' %}">
+            <img alt="Logo" class="d-inline-block align-text-top" height="50" src="/static/images/logo1.png" width="60">
+            <!--may be needed to add href in this line-->
+            <!--      Voting-->
+        </a>
+        <button aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation"
+                class="navbar-toggler"
+                data-bs-target="#navbarNavAltMarkup" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <!--        <button class="btn  btn-outline-secondary" type="button">Home</button>-->
+<!--                <a aria-current="page" class="nav-link active" href="{% url 'index' %}"-->
+<!--                   style="font-size: 20px;">Home</a>-->
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'add_poll' %}">
+                    <button class="btn  btn-outline-success ms-2 me-2" style="margin-left: 20px;" type="button">Add a
+                        poll
+                    </button>
+                </a>
+                {% endif %}
+                <a href="{% url 'my_polls' %}">
+                    <button class="btn  btn-outline-success" type="button">See polls</button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if request.user.is_authenticated %}
+
+    <ul class="navbar-nav mr-right">
+                        <span class="navbar-text" style="color: gray; width: 100px;">
+                            Hello, {{ request.user.username }}!
+                        </span>
+        <a href="{% url 'logout' %}">
+            <button class="btn  btn-outline-warning me-4" style="width: 100px; margin-left: 20px;" type="button">Log
+                Out
+            </button>
+        </a>
+    </ul>
+
+    {% else %}
+
+    <li class="navbar-nav mr-right nav-item">
+        <a aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary my-2 me-4"
+           href="{% url 'register' %}" role="button" style="width: 100px;">Sign Up</a>
+    </li>
+
+    <li class="navbar-nav mr-right nav-item">
+        <a aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary my-2 me-4"
+           href="{% url 'login' %}" role="button" style="width: 100px;">Log In</a>
+    </li>
+
+    {% endif %}
+</nav>

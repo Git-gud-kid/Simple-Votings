@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <h3 style="margin-bottom: 20px"><strong>Pick Your Choice</strong></h3>
+
+            <h4>{{ poll.question }}</h4>
+            <form action="{% url 'vote' poll.id %}" method="POST"> {% csrf_token %}
+                <ul class="list-group" style="margin:0px">
+                    <li class="list-group-item">
+                        <input aria-label="..." class="form-check-input me-1" name="poll" type="radio" value="option1">
+                        {{ poll.option_one }}
+                    </li>
+                    <li class="list-group-item">
+                        <input aria-label="..." class="form-check-input me-1" name="poll" type="radio" value="option2">
+                        {{ poll.option_two }}
+                    </li>
+                    <li class="list-group-item">
+                        <input aria-label="..." class="form-check-input me-1" name="poll" type="radio" value="option3">
+                        {{ poll.option_three }}
+                    </li>
+                </ul>
+                <input class="btn btn-primary" type="submit" value="Submit" style="margin-top: 10px;">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

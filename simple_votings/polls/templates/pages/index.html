@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container text-center">
+    <p>Добро пожаловать! На этом сайте вы можете создать свое голосование или учавствовать в других!</p>
+    {% if not request.user.is_authenticated %}
+        <p>Для того чтобы создать голосование сперва нужно зарегистрироваться на сайте.</p>
+    {% endif %}
+    <hr>
+</div>
+
+{% endblock %}
