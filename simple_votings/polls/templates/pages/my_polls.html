@@ -8,11 +8,40 @@
         border-spacing: 0;
         border-radius: 1.25rem;
         overflow: hidden;
+        opacity: 0.85;
     }
 </style>
 
+
 <div class="container mt-4" style="margin-bottom: 80px;">
-    <table class="table table-dark table-striped table-hover rounded-table">
+    <div class="d-flex justify-content-between mb-3">
+        <div aria-label="Basic radio toggle button group" class="btn-group" role="group" style="margin-bottom: 5px;">
+            <input autocomplete="off" checked class="btn-check" id="btnradio1" name="category" onclick="filterPolls()"
+                   type="radio">
+            <label class="btn btn-outline-primary" for="btnradio1">New</label>
+
+            <input autocomplete="off" class="btn-check" id="btnradio2" name="category" onclick="filterPolls()"
+                   type="radio">
+            <label class="btn btn-outline-primary" for="btnradio2">Popular</label>
+        </div>
+
+        <div aria-label="Basic radio toggle button group" class="btn-group" role="group" style="margin-bottom: 5px;">
+            <input autocomplete="off" checked class="btn-check" id="btnradio3" name="ownership" onclick="filterPolls()"
+                   type="radio">
+            <label class="btn btn-outline-primary" for="btnradio3">All polls</label>
+
+            {% if user.is_authenticated %}
+            <input autocomplete="off" class="btn-check" id="btnradio4" name="ownership" onclick="filterPolls()"
+                   type="radio">
+            <label class="btn btn-outline-primary" for="btnradio4">My polls</label>
+            {% else %}
+            <input autocomplete="off" class="btn-check" disabled id="btnradio4" name="ownership" type="radio">
+            <label class="btn btn-outline-primary" for="btnradio4">My polls</label>
+            {% endif %}
+        </div>
+    </div>
+
+    <table class="table rounded-table table-striped table-hover table-dark">
         <thead>
         <tr>
             <th scope="col">ID</th>
@@ -22,9 +51,63 @@
             <th scope="col">Vote</th>
         </tr>
         </thead>
-        <tbody>
-        {% for poll in polls %}
-        <tr>
+        <tbody id="pollsTable">
+        {% for poll in all_polls_by_freshness %}
+        <tr class="poll-row new all">
+            <td>{{ poll.id }}</td>
+            <td><a class="text-white" href="{% url 'view_poll' poll.id %}" style="text-decoration: none;">{{ poll.question }}</a></td>
+            <td>{{ poll.author.username }}</td>
+            <td>{{ poll.time }}</td>
+            <td>
+                {% if user.is_authenticated %}
+                <a href="{% url 'vote' poll.id %}">
+                    <button class="btn btn-outline-success ms-2 me-2" type="button">Vote</button>
+                    {% else %}
+                    <button class="btn btn-outline-success ms-2 me-2 disabled" type="button">Vote</button>
+                    {% endif %}
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+        {% for poll in all_polls_by_popularity %}
+        <tr class="poll-row popular all" style="display:none;">
+            <td>{{ poll.id }}</td>
+            <td><a class="text-white" href="{% url 'view_poll' poll.id %}" style="text-decoration: none;"> {{ poll.question }}</a></td>
+            <td>{{ poll.author.username }}</td>
+            <td>{{ poll.time }}</td>
+            <td>
+                {% if user.is_authenticated %}
+                <a href="{% url 'vote' poll.id %}">
+                    <button class="btn btn-outline-success ms-2 me-2" type="button">Vote</button>
+                    {% else %}
+                    <button class="btn btn-outline-success ms-2 me-2 disabled" type="button">Vote</button>
+                    {% endif %}
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+        {% if my_polls_by_freshness %}
+        {% for poll in my_polls_by_freshness %}
+        <tr class="poll-row new mine" style="display:none;">
+            <td>{{ poll.id }}</td>
+            <td><a class="text-white" href="{% url 'view_poll' poll.id %}" style="text-decoration: none;">{{ poll.question }}</a></td>
+            <td>{{ poll.author.username }}</td>
+            <td>{{ poll.time }}</td>
+            <td>
+                {% if user.is_authenticated %}
+                <a href="{% url 'vote' poll.id %}">
+                    <button class="btn btn-outline-success ms-2 me-2" type="button">Vote</button>
+                    {% else %}
+                    <button class="btn btn-outline-success ms-2 me-2 disabled" type="button">Vote</button>
+                    {% endif %}
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        {% if my_polls_by_popularity %}
+        {% for poll in my_polls_by_popularity %}
+        <tr class="poll-row popular mine" style="display:none;">
             <td>{{ poll.id }}</td>
             <td><a class="text-white" href="{% url 'view_poll' poll.id %}" style="text-decoration: none;">
                 {{ poll.question }}</a></td>
@@ -41,7 +124,37 @@
             </td>
         </tr>
         {% endfor %}
+        {% endif %}
         </tbody>
     </table>
 </div>
+</div>
+
+<script>
+    function filterPolls() {
+        const category = document.querySelector('input[name="category"]:checked').id;
+        const ownership = document.querySelector('input[name="ownership"]:checked').id;
+
+        const rows = document.querySelectorAll('.poll-row');
+        rows.forEach(row => {
+            row.style.display = 'none'; // Hide all rows initially
+
+            // Show rows that match the selected category and ownership
+            if (category === 'btnradio1' && ownership === 'btnradio3' && row.classList.contains('new') && row.classList.contains('all')) {
+                row.style.display = '';
+            } else if (category === 'btnradio1' && ownership === 'btnradio4' && row.classList.contains('new') && row.classList.contains('mine')) {
+                row.style.display = '';
+            } else if (category === 'btnradio2' && ownership === 'btnradio3' && row.classList.contains('popular') && row.classList.contains('all')) {
+                row.style.display = '';
+            } else if (category === 'btnradio2' && ownership === 'btnradio4' && row.classList.contains('popular') && row.classList.contains('mine')) {
+                row.style.display = '';
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        filterPolls(); // Initial filtering on page load
+    });
+</script>
+
 {% endblock %}

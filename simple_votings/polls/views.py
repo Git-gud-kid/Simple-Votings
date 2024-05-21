@@ -1,12 +1,11 @@
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.forms import formset_factory
+from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from polls.models import Poll
-from polls.forms import SignUpForm
-
 from polls.forms import CreatePollForm
+from polls.forms import SignUpForm
+from polls.models import Poll
 
 
 # Create your views here.
@@ -47,8 +46,9 @@ def add_poll(request):
             return redirect('vote', poll_id=new_poll.id)
     else:
         form = CreatePollForm()
-    context = {'form': form, 'pagename': 'Add Poll'}
+    context = {'form': form, 'pagename': 'Add a Poll'}
     return render(request, 'pages/add_poll.html', context)
+
 
 @login_required
 def vote(request, poll_id):
@@ -80,10 +80,40 @@ def view_poll(request, poll_id):
     return render(request, 'pages/view_poll.html', context)
 
 
-def my_polls(request):
-    polls = Poll.objects.all()
+# def view_polls(request):
+#     polls = Poll.objects.all()
+#     my_polls = []
+#     if request.user.is_authenticated:
+#         my_polls = Poll.objects.filter(author=request.user)
+#     polls_by_freshness = polls.order_by('-time')
+#     polls_by_popularity = Poll.objects.annotate(
+#         total_votes=F('option_one_count') + F('option_two_count') + F('option_three_count')
+#     ).order_by('-total_votes', '-time')
+#
+#     context = {
+#         'polls': polls,
+#         'my_polls': my_polls,
+#         'polls_by_freshness': polls_by_freshness,
+#         'polls_by_popularity': polls_by_popularity,
+#         'pagename': "Polls",
+#     }
+#     return render(request, 'pages/my_polls.html', context)
+
+
+def view_polls(request):
+    all_polls = Poll.objects.all()
+    my_polls = Poll.objects.filter(author=request.user) if request.user.is_authenticated else Poll.objects.none()
+
     context = {
-        'polls': polls,
-        'pagename': "Polls",
+        'pagename': 'Polls',
+        'all_polls_by_freshness': all_polls.order_by('-time'),
+        'all_polls_by_popularity': all_polls.annotate(
+            total_votes=F('option_one_count') + F('option_two_count') + F('option_three_count')).order_by(
+            '-total_votes'),
+        'my_polls_by_freshness': my_polls.order_by('-time'),
+        'my_polls_by_popularity': my_polls.annotate(
+            total_votes=F('option_one_count') + F('option_two_count') + F('option_three_count')).order_by(
+            '-total_votes'),
     }
+
     return render(request, 'pages/my_polls.html', context)

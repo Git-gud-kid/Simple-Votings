@@ -26,7 +26,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(template_name='pages/login.html', extra_context={'pagename': "Login"}), name='login'),  # Sign in
     path('logout/', LogoutView.as_view(next_page='index'), name='logout'),  # Log out
     path('add_poll/', views.add_poll, name='add_poll'),  # Add a new poll
-    path('my_polls/', views.my_polls, name='my_polls'),  # See all polls
+    path('view_polls/', views.view_polls, name='view_polls'),  # See all polls
     path('view_poll/<poll_id>', views.view_poll, name='view_poll'),  # See a poll
     path('vote/<poll_id>/', views.vote, name='vote'),  # Vote for a poll
 ]

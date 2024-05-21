@@ -7,24 +7,45 @@
             <h3 style="margin-bottom: 20px"><strong>Pick Your Choice</strong></h3>
 
             <h4>{{ poll.question }}</h4>
-            <form action="{% url 'vote' poll.id %}" method="POST"> {% csrf_token %}
+            <form action="{% url 'vote' poll.id %}" method="POST">
+                {% csrf_token %}
                 <ul class="list-group" style="margin:0px">
                     <li class="list-group-item">
-                        <input aria-label="..." class="form-check-input me-1" name="poll" type="radio" value="option1">
+                        <input aria-label="..." class="form-check-input me-1" name="poll" type="radio" value="option1" onclick="checkSelection()">
                         {{ poll.option_one }}
                     </li>
                     <li class="list-group-item">
-                        <input aria-label="..." class="form-check-input me-1" name="poll" type="radio" value="option2">
+                        <input aria-label="..." class="form-check-input me-1" name="poll" type="radio" value="option2" onclick="checkSelection()">
                         {{ poll.option_two }}
                     </li>
                     <li class="list-group-item">
-                        <input aria-label="..." class="form-check-input me-1" name="poll" type="radio" value="option3">
+                        <input aria-label="..." class="form-check-input me-1" name="poll" type="radio" value="option3" onclick="checkSelection()">
                         {{ poll.option_three }}
                     </li>
                 </ul>
-                <input class="btn btn-primary" type="submit" value="Submit" style="margin-top: 10px;">
+                <input class="btn btn-primary" id="submit-button" type="submit" value="Submit" style="margin-top: 10px;" disabled>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    function checkSelection() {
+        const submitButton = document.getElementById('submit-button');
+        const radioButtons = document.querySelectorAll('input[name="poll"]');
+        let isSelected = false;
+
+        radioButtons.forEach(radio => {
+            if (radio.checked) {
+                isSelected = true;
+            }
+        });
+
+        submitButton.disabled = !isSelected;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        checkSelection(); // Ensure the button is disabled on initial load
+    });
+</script>
 {% endblock %}
