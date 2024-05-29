@@ -2,12 +2,50 @@
 
 {% block content %}
 
+{% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-success" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 <div class="container text-center">
-    <p>Добро пожаловать! На этом сайте вы можете создать свое голосование или учавствовать в других!</p>
-    {% if not request.user.is_authenticated %}
-        <p>Для того чтобы создать голосование сперва нужно зарегистрироваться на сайте.</p>
-    {% endif %}
-    <hr>
+    <!--    <p>Добро пожаловать! На этом сайте вы можете создать свое голосование или учавствовать в других!</p>-->
+    <!--    {% if not request.user.is_authenticated %}-->
+    <!--    <p>Для того чтобы создать голосование сперва нужно зарегистрироваться на сайте.</p>-->
+    <!--    {% endif %}-->
+    <!--    <hr>-->
+    <div class="card mb-2" style="opacity: 0.8;">
+        <div class="card-header">
+            Start Voting!
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">An easy-to-use website on which you can create polls and more!</h5>
+            {% if not request.user.is_authenticated %} <p class="card-text">But you'll have to register before you can
+            add a poll yourself</p> {% endif %}
+            {% if not request.user.is_authenticated %}
+            <button class="btn btn-primary mt-4" disabled>Add a poll</button>
+            {% else %}
+            <a class="btn btn-primary mt-4" href="{% url 'add_poll' %}">Add a poll</a>
+            {% endif %}
+            <a class="btn btn-primary mt-4" href="{% url 'view_polls' %}">See polls</a>
+        </div>
+    </div>
+
+    <div class="card" style="opacity: 0.8;">
+        <div class="card-header">
+            Featured Poll
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">This poll has the most votes at the moment!</h5>
+            <p class="card-text">{{ most_popular_poll.question }}</p>
+            <p class="card-text">Author - {{ most_popular_poll.author.username }}. </p>
+            <a class="btn btn-primary" href="{% url 'view_poll' most_popular_poll.id %}">Go to poll</a>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

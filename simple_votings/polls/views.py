@@ -19,7 +19,15 @@ def get_base_context(request, pagename):
 
 
 def index_page(request):
-    context = get_base_context(request, 'Voting')
+    most_popular_poll = Poll.objects.annotate(
+        total_votes=F('option_one_count') + F('option_two_count') + F('option_three_count')).order_by(
+        '-total_votes').order_by('-total_votes').first()
+
+    context = {
+        'pagename': 'Voting',
+        'most_popular_poll': most_popular_poll,
+    }
+
     return render(request, 'pages/index.html', context)
 
 
@@ -55,16 +63,19 @@ def vote(request, poll_id):
     poll = Poll.objects.get(pk=poll_id)
 
     if request.method == 'POST':
+        selected_options = request.POST.getlist('poll') if poll.question_type == 'multiple' else [request.POST['poll']]
+        if not selected_options:
+            return HttpResponse(400, 'No options selected')
 
-        selected_option = request.POST['poll']
-        if selected_option == 'option1':
-            poll.option_one_count += 1
-        elif selected_option == 'option2':
-            poll.option_two_count += 1
-        elif selected_option == 'option3':
-            poll.option_three_count += 1
-        else:
-            return HttpResponse(400, 'Invalid form')
+        for option in selected_options:
+            if option == 'option1':
+                poll.option_one_count += 1
+            elif option == 'option2':
+                poll.option_two_count += 1
+            elif option == 'option3':
+                poll.option_three_count += 1
+            else:
+                return HttpResponse(400, 'Invalid form')
 
         poll.save()
 
@@ -78,26 +89,6 @@ def view_poll(request, poll_id):
     poll = Poll.objects.get(pk=poll_id)
     context = {'poll': poll, 'pagename': 'Poll Result'}
     return render(request, 'pages/view_poll.html', context)
-
-
-# def view_polls(request):
-#     polls = Poll.objects.all()
-#     my_polls = []
-#     if request.user.is_authenticated:
-#         my_polls = Poll.objects.filter(author=request.user)
-#     polls_by_freshness = polls.order_by('-time')
-#     polls_by_popularity = Poll.objects.annotate(
-#         total_votes=F('option_one_count') + F('option_two_count') + F('option_three_count')
-#     ).order_by('-total_votes', '-time')
-#
-#     context = {
-#         'polls': polls,
-#         'my_polls': my_polls,
-#         'polls_by_freshness': polls_by_freshness,
-#         'polls_by_popularity': polls_by_popularity,
-#         'pagename': "Polls",
-#     }
-#     return render(request, 'pages/my_polls.html', context)
 
 
 def view_polls(request):
@@ -116,4 +107,4 @@ def view_polls(request):
             '-total_votes'),
     }
 
-    return render(request, 'pages/my_polls.html', context)
+    return render(request, 'pages/view_polls.html', context)

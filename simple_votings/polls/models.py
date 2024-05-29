@@ -45,6 +45,11 @@ class Poll(models.Model):
 
 
 class Poll(models.Model):
+    QUESTION_TYPE_CHOICES = [
+        ('single', 'Single Choice'),
+        ('multiple', 'Multiple Choice'),
+    ]
+
     question = models.TextField()
     option_one = models.CharField(max_length=50)
     option_two = models.CharField(max_length=50)
@@ -54,6 +59,7 @@ class Poll(models.Model):
     option_three_count = models.IntegerField(default=0)
     author = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     time = models.DateTimeField(default=now)
+    question_type = models.CharField(max_length=10, choices=QUESTION_TYPE_CHOICES, default='single')
 
     def total(self):
         return self.option_one_count + self.option_two_count + self.option_three_count

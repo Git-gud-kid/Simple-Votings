@@ -19,11 +19,13 @@ from django.urls import include, path
 
 from polls import views
 
+from polls.forms import CustomLoginView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index_page, name='index'),  # Index page
     path('register/', views.register, name='register'),  # Sign up
-    path('login/', LoginView.as_view(template_name='pages/login.html', extra_context={'pagename': "Login"}), name='login'),  # Sign in
+    path('login/', CustomLoginView.as_view(template_name='pages/login.html', extra_context={'pagename': "Login"}), name='login'),  # Sign in
     path('logout/', LogoutView.as_view(next_page='index'), name='logout'),  # Log out
     path('add_poll/', views.add_poll, name='add_poll'),  # Add a new poll
     path('view_polls/', views.view_polls, name='view_polls'),  # See all polls
